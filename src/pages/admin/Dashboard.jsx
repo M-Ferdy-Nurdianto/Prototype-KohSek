@@ -14,13 +14,17 @@ import {
   Search,
   Filter,
   MapPin,
-  MoreVertical
+  MoreVertical,
+  ArrowLeft,
+  Save,
+  Image as ImageIcon
 } from 'lucide-react';
 import { events as mockEvents, formatPrice } from '../../data/mockData';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
+  const [isCreatingEvent, setIsCreatingEvent] = useState(false);
 
   useEffect(() => {
     const isAuth = localStorage.getItem('admin_auth');
@@ -48,7 +52,7 @@ const Dashboard = () => {
     { name: 'Total Revenue', value: 'Rp 4.5M', icon: TrendingUp, color: 'bg-green-500' },
   ];
 
-  // Render Functions for Tabs
+  // Render Functions
   const renderOverview = () => (
     <div className="space-y-8">
       <div className="grid md:grid-cols-3 gap-8">
@@ -180,41 +184,116 @@ const Dashboard = () => {
     </div>
   );
 
-  const renderEvents = () => (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <h3 className="text-2xl font-bold text-neutral">Active Events</h3>
-        <button className="flex items-center space-x-2 bg-primary text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
-          <Plus className="h-5 w-5" />
-          <span>Add New Event</span>
+  const renderEventForm = () => (
+    <motion.div 
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-sm"
+    >
+      <div className="flex items-center space-x-4 mb-10">
+        <button 
+          onClick={() => setIsCreatingEvent(false)}
+          className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all"
+        >
+          <ArrowLeft className="h-5 w-5" />
         </button>
+        <h3 className="text-2xl font-black text-neutral">Create New Event</h3>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8">
-        {mockEvents.map((event) => (
-          <div key={event.id} className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all group">
-            <div className="flex justify-between items-start mb-6">
-              <div className="bg-slate-50 px-5 py-2.5 rounded-2xl text-center">
-                <span className="block text-primary font-black text-xl">{event.date.split(' ')[0]}</span>
-                <span className="block text-slate-400 text-[10px] uppercase font-black">{event.date.split(' ')[1]}</span>
-              </div>
-              <div className="px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-black tracking-widest uppercase">{event.time}</div>
+      <form className="grid md:grid-cols-2 gap-8">
+        <div className="space-y-6">
+          <div>
+            <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Event Title</label>
+            <input type="text" placeholder="e.g. Espresso Morning Session" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-primary/20 font-bold text-neutral" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Date</label>
+              <input type="date" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-primary/20 font-bold text-neutral" />
             </div>
-            <h4 className="text-2xl font-black text-neutral mb-4 group-hover:text-primary transition-colors">{event.title}</h4>
-            <div className="flex items-center text-slate-400 mb-8 font-medium">
-              <MapPin className="h-4 w-4 mr-2" />
-              <span>{event.location}</span>
-            </div>
-            <div className="flex justify-between items-center pt-6 border-t border-slate-50">
-              <span className="text-xl font-black text-neutral">{event.price}</span>
-              <div className="flex gap-2">
-                <button className="px-4 py-2 rounded-xl border border-slate-100 text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all">Edit</button>
-                <button className="px-4 py-2 rounded-xl bg-red-50 text-red-500 text-sm font-bold hover:bg-red-100 transition-all">Delete</button>
-              </div>
+            <div>
+              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Time</label>
+              <input type="time" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-primary/20 font-bold text-neutral" />
             </div>
           </div>
-        ))}
-      </div>
+          <div>
+            <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Location</label>
+            <div className="relative">
+              <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
+              <input type="text" placeholder="e.g. Kohi Cafe, Yogyakarta" className="w-full pl-14 pr-6 py-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-primary/20 font-bold text-neutral" />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <div>
+            <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Base Price (IDR)</label>
+            <input type="number" placeholder="50000" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-primary/20 font-bold text-neutral" />
+          </div>
+          <div>
+            <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Event Banner</label>
+            <div className="border-2 border-dashed border-slate-200 rounded-3xl p-10 text-center hover:border-primary hover:bg-primary/5 transition-all cursor-pointer group">
+              <ImageIcon className="h-10 w-10 text-slate-300 mx-auto mb-4 group-hover:text-primary" />
+              <p className="text-sm font-bold text-slate-400 group-hover:text-primary">Click to upload image</p>
+            </div>
+          </div>
+          <div className="pt-4">
+            <button 
+              type="button" 
+              onClick={() => setIsCreatingEvent(false)}
+              className="w-full bg-neutral text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-neutral/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center"
+            >
+              <Save className="mr-2 h-5 w-5" />
+              Save Event
+            </button>
+          </div>
+        </div>
+      </form>
+    </motion.div>
+  );
+
+  const renderEvents = () => (
+    <div className="space-y-8">
+      {!isCreatingEvent ? (
+        <>
+          <div className="flex justify-between items-center">
+            <h3 className="text-2xl font-bold text-neutral">Active Events</h3>
+            <button 
+              onClick={() => setIsCreatingEvent(true)}
+              className="flex items-center space-x-2 bg-primary text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
+            >
+              <Plus className="h-5 w-5" />
+              <span>Add New Event</span>
+            </button>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {mockEvents.map((event) => (
+              <div key={event.id} className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all group">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="bg-slate-50 px-5 py-2.5 rounded-2xl text-center">
+                    <span className="block text-primary font-black text-xl">{event.date.split(' ')[0]}</span>
+                    <span className="block text-slate-400 text-[10px] uppercase font-black">{event.date.split(' ')[1]}</span>
+                  </div>
+                  <div className="px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-black tracking-widest uppercase">{event.time}</div>
+                </div>
+                <h4 className="text-2xl font-black text-neutral mb-4 group-hover:text-primary transition-colors">{event.title}</h4>
+                <div className="flex items-center text-slate-400 mb-8 font-medium">
+                  <MapPin className="h-4 w-4 mr-2" />
+                  <span>{event.location}</span>
+                </div>
+                <div className="flex justify-between items-center pt-6 border-t border-slate-50">
+                  <span className="text-xl font-black text-neutral">{event.price}</span>
+                  <div className="flex gap-2">
+                    <button className="px-4 py-2 rounded-xl border border-slate-100 text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all">Edit</button>
+                    <button className="px-4 py-2 rounded-xl bg-red-50 text-red-500 text-sm font-bold hover:bg-red-100 transition-all">Delete</button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      ) : renderEventForm()}
     </div>
   );
 
@@ -236,7 +315,10 @@ const Dashboard = () => {
           ].map((item) => (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => {
+                setActiveTab(item.id);
+                setIsCreatingEvent(false); // Reset event form state when changing tabs
+              }}
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-bold transition-all ${
                 activeTab === item.id 
                   ? 'bg-primary/10 text-primary shadow-sm' 
@@ -264,14 +346,10 @@ const Dashboard = () => {
       <main className="flex-grow p-8 lg:p-12 overflow-y-auto max-h-screen">
         <header className="flex justify-between items-center mb-12">
           <div className="flex items-center space-x-4">
-            <div className="lg:hidden">
-              {/* Mobile menu toggle would go here */}
-              <div className="w-10 h-10 bg-white rounded-xl shadow-sm border border-slate-100 flex items-center justify-center">
-                <Filter className="h-5 w-5 text-slate-400" />
-              </div>
-            </div>
             <div>
-              <h2 className="text-3xl font-extrabold text-neutral capitalize">{activeTab}</h2>
+              <h2 className="text-3xl font-extrabold text-neutral capitalize">
+                {isCreatingEvent ? 'New Event' : activeTab}
+              </h2>
               <p className="text-slate-400 font-medium">Manage your Kohi Sekai operations.</p>
             </div>
           </div>
@@ -289,10 +367,10 @@ const Dashboard = () => {
         {/* Dynamic Content */}
         <AnimatePresence mode="wait">
           <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, x: 10 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -10 }}
+            key={activeTab + (isCreatingEvent ? '-form' : '-list')}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
           >
             {activeTab === 'overview' && renderOverview()}

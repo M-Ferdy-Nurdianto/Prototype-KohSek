@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@theme {
+  --font-plus-jakarta: "Plus Jakarta Sans", sans-serif;
+  
+  --color-primary: #B19685;
+  --color-secondary: #E8D3C9;
+  --color-tertiary: #D4BDB0;
+  --color-neutral: #7B7674;
+  --color-background: #FDFBF9;
+  
+  --radius-4xl: 2rem;
+}
+
+@layer base {
+  body {
+    @apply font-plus-jakarta bg-background text-neutral scroll-smooth;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/70 backdrop-blur-md;
+  }
+}

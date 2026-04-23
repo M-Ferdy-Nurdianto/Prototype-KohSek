@@ -45,11 +45,6 @@ const Footer = () => {
           <div className="text-sm text-neutral/30 font-medium">
             &copy; {new Date().getFullYear()} <span className="text-neutral/60">JuraganWebsite</span>. All rights reserved.
           </div>
-          <div className="flex items-center space-x-2 text-xs font-bold text-neutral/20 uppercase tracking-widest">
-            <span>Made with</span>
-            <span className="text-primary text-lg">♥</span>
-            <span>in Yogyakarta</span>
-          </div>
         </div>
       </div>
     </footer>

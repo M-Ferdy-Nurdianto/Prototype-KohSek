@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kohi Sekai | Official Website</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FDFBF9;
+            color: #7B7674;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .text-primary { color: #B19685; }
+        .bg-primary { background-color: #B19685; }
+        .border-primary { border-color: #B19685; }
+        
+        .text-secondary { color: #E8D3C9; }
+        .bg-secondary { background-color: #E8D3C9; }
+        
+        .text-tertiary { color: #D4BDB0; }
+        .bg-tertiary { background-color: #D4BDB0; }
+        
+        .text-neutral { color: #7B7674; }
+        .bg-neutral { background-color: #7B7674; }
+
+        .hover-lift {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .hover-lift:hover {
+            transform: translateY(-8px);
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#B19685',
+                        secondary: '#E8D3C9',
+                        tertiary: '#D4BDB0',
+                        neutral: '#7B7674',
+                        background: '#FDFBF9',
+                    },
+                    borderRadius: {
+                        '4xl': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body x-data="kohiApp">
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 transition-all duration-300 glass" :class="{'py-4': !atTop, 'py-6': atTop}" x-data="{ atTop: true }" @scroll.window="atTop = (window.pageYOffset > 50 ? false : true)">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <a href="index.html" class="text-2xl font-extrabold tracking-tight text-primary">KOHI <span class="text-neutral font-light">SEKAI</span></a>
+            
+            <div class="hidden md:flex space-x-10 items-center">
+                <a href="index.html" class="font-medium text-primary hover:text-primary transition-colors">Home</a>
+                <a href="members.html" class="font-medium hover:text-primary transition-colors">Member</a>
+                <a href="cheki.html" class="font-medium hover:text-primary transition-colors">Cheki</a>
+                <a href="cheki.html" class="bg-primary text-white px-6 py-2.5 rounded-full font-semibold hover:bg-opacity-90 transition-all shadow-lg shadow-primary/20">Buy Cheki</a>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button class="md:hidden text-neutral">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center pt-20 overflow-hidden">
+        <div class="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center relative z-10">
+            <div class="space-y-8" x-transition:enter="transition ease-out duration-1000" x-transition:enter-start="opacity-0 translate-x-[-50px]" x-transition:enter-end="opacity-100 translate-x-0">
+                <div class="inline-block px-4 py-1.5 rounded-full bg-secondary/30 text-primary font-semibold text-sm tracking-wider uppercase">Official Website</div>
+                <h1 class="text-6xl md:text-8xl font-extrabold text-neutral leading-[1.1]">
+                    The World of <span class="text-primary italic">Kohi</span>
+                </h1>
+                <p class="text-lg text-neutral/70 max-w-lg leading-relaxed">
+                    A warm blend of melodies and moments. Experience the unique Chika Idol sensation from Yogyakarta, where every performance feels like a fresh brew.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="cheki.html" class="bg-primary text-white px-10 py-4 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-xl shadow-primary/30">Buy Cheki Ticket</a>
+                    <a href="#events" class="border-2 border-primary/20 text-primary px-10 py-4 rounded-full font-bold text-lg hover:bg-primary/5 transition-colors">Upcoming Events</a>
+                </div>
+            </div>
+            <div class="relative group">
+                <div class="absolute -inset-4 bg-primary/10 rounded-4xl blur-3xl group-hover:bg-primary/20 transition-all duration-700"></div>
+                <img src="img/hero.png" alt="Kohi Sekai Group" class="relative rounded-4xl shadow-2xl w-full object-cover aspect-[4/5] md:aspect-square">
+                <div class="absolute -bottom-6 -right-6 bg-white p-6 rounded-3xl shadow-xl hidden md:block">
+                    <div class="flex items-center space-x-4">
+                        <div class="flex -space-x-3">
+                            <template x-for="member in members.slice(0, 3)">
+                                <img :src="member.image" class="w-10 h-10 rounded-full border-2 border-white object-cover">
+                            </template>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-neutral">3 Members</p>
+                            <p class="text-[10px] text-neutral/50">Yogyakarta, ID</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Decorative background elements -->
+        <div class="absolute top-0 right-0 w-1/3 h-1/3 bg-secondary/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4"></div>
+        <div class="absolute bottom-0 left-0 w-1/2 h-1/2 bg-tertiary/10 rounded-full blur-[150px] translate-y-1/3 -translate-x-1/4"></div>
+    </section>
+
+    <!-- Event Schedule -->
+    <section id="events" class="py-32 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-20">
+                <h2 class="text-4xl font-extrabold text-neutral mb-4">Event Schedule</h2>
+                <p class="text-neutral/50 max-w-2xl mx-auto italic">"Meet us at the next session. Let's create beautiful memories over music."</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <template x-for="event in events">
+                    <div class="group bg-background rounded-3xl p-8 border border-neutral/5 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5">
+                        <div class="flex justify-between items-start mb-6">
+                            <div class="bg-white px-4 py-2 rounded-2xl shadow-sm text-center">
+                                <span class="block text-primary font-bold text-xl" x-text="event.date.split(' ')[0]"></span>
+                                <span class="block text-neutral/50 text-[10px] uppercase font-bold" x-text="event.date.split(' ')[1]"></span>
+                            </div>
+                            <div class="px-4 py-1.5 rounded-full bg-secondary/40 text-primary text-xs font-bold" x-text="event.time"></div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-neutral mb-2 group-hover:text-primary transition-colors" x-text="event.title"></h3>
+                        <div class="flex items-center text-neutral/60 mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span class="text-sm" x-text="event.location"></span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-extrabold text-neutral" x-text="event.price"></span>
+                            <a href="cheki.html" class="text-primary font-bold hover:underline">Get Tickets &rarr;</a>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </section>
+
+    <!-- Spotify Section -->
+    <section class="py-32 bg-background relative overflow-hidden">
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-4xl font-extrabold text-neutral mb-6">Listen to Our Brews</h2>
+                    <p class="text-lg text-neutral/60 mb-8 leading-relaxed">
+                        Stream our latest singles and curated playlists. From the upbeat "Mocca Morning" to the soulful "Black Coffee Night", we have a rhythm for every mood.
+                    </p>
+                    <div class="flex items-center space-x-6">
+                        <div class="p-4 bg-white rounded-2xl shadow-sm border border-neutral/5 flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-[#1DB954]/10 rounded-full flex items-center justify-center text-[#1DB954]">
+                                <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.485 17.306c-.215.352-.676.463-1.028.248-2.856-1.745-6.452-2.14-10.686-1.173-.404.092-.813-.158-.905-.562-.092-.404.158-.813.562-.905 4.63-1.06 8.59-.61 11.804 1.353.352.215.463.676.248 1.028zm1.464-3.262c-.271.44-.847.579-1.287.308-3.27-2.008-8.254-2.593-12.122-1.418-.496.151-1.022-.128-1.173-.624-.151-.496.128-1.022.624-1.173 4.417-1.341 9.904-.683 13.65 1.62.44.271.579.847.308 1.287zm.126-3.376C15.34 8.483 9.176 8.277 5.617 9.358c-.53.161-1.088-.139-1.249-.669-.161-.53.139-1.088.669-1.249 4.09-1.241 10.9-1.002 15.207 1.554.477.283.633.897.35 1.374-.283.477-.897.633-1.374.35z"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-neutral">Spotify</p>
+                                <p class="text-[10px] text-neutral/40 uppercase tracking-widest">Verified Artist</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="rounded-3xl overflow-hidden shadow-2xl transform md:rotate-2 hover:rotate-0 transition-transform duration-700 border-8 border-white">
+                    <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM3M?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white py-20 border-t border-neutral/5">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-12">
+                <a href="#" class="text-3xl font-extrabold text-primary mb-8 md:mb-0">KOHI <span class="text-neutral font-light">SEKAI</span></a>
+                <div class="flex space-x-8">
+                    <a href="#" class="text-neutral/60 hover:text-primary transition-colors">Instagram</a>
+                    <a href="#" class="text-neutral/60 hover:text-primary transition-colors">Twitter</a>
+                    <a href="#" class="text-neutral/60 hover:text-primary transition-colors">TikTok</a>
+                    <a href="#" class="text-neutral/60 hover:text-primary transition-colors">YouTube</a>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between items-center pt-12 border-t border-neutral/5 text-sm text-neutral/40">
+                <p>&copy; 2026 Kohi Sekai. All rights reserved.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-primary transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-primary transition-colors">Admin Login</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

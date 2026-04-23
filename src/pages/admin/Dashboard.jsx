@@ -1,17 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, 
   Ticket, 
   Calendar, 
-  Users, 
   Settings, 
   LogOut,
   TrendingUp,
   Clock,
-  CheckCircle2
+  CheckCircle2,
+  Plus,
+  Search,
+  Filter,
+  MapPin,
+  MoreVertical
 } from 'lucide-react';
+import { events as mockEvents, formatPrice } from '../../data/mockData';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -29,11 +34,189 @@ const Dashboard = () => {
     navigate('/admin/login');
   };
 
+  // Mock Data
+  const orders = [
+    { id: 'KH-8293', member: 'Dea', customer: 'Budi Santoso', status: 'Completed', time: '2 mins ago', total: 37500 },
+    { id: 'KH-8292', member: 'Vinci', customer: 'Siti Aminah', status: 'Pending', time: '15 mins ago', total: 72500 },
+    { id: 'KH-8291', member: 'Faatin', customer: 'Andi Wijaya', status: 'Completed', time: '1 hour ago', total: 37500 },
+    { id: 'KH-8290', member: 'Dea', customer: 'Rina Rose', status: 'Cancelled', time: '3 hours ago', total: 37500 },
+  ];
+
   const stats = [
     { name: 'Total Orders', value: '124', icon: Ticket, color: 'bg-blue-500' },
-    { name: 'Active Events', value: '3', icon: Calendar, color: 'bg-purple-500' },
+    { name: 'Active Events', value: mockEvents.length.toString(), icon: Calendar, color: 'bg-purple-500' },
     { name: 'Total Revenue', value: 'Rp 4.5M', icon: TrendingUp, color: 'bg-green-500' },
   ];
+
+  // Render Functions for Tabs
+  const renderOverview = () => (
+    <div className="space-y-8">
+      <div className="grid md:grid-cols-3 gap-8">
+        {stats.map((stat) => (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            key={stat.name} 
+            className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100"
+          >
+            <div className={`${stat.color} w-12 h-12 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-current/10`}>
+              <stat.icon className="h-6 w-6 text-white" />
+            </div>
+            <h4 className="text-slate-400 font-bold text-sm uppercase tracking-widest mb-1">{stat.name}</h4>
+            <p className="text-3xl font-black text-neutral">{stat.value}</p>
+          </motion.div>
+        ))}
+      </div>
+
+      <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
+        <div className="p-8 border-b border-slate-100 flex justify-between items-center">
+          <h3 className="text-xl font-bold text-neutral">Recent Orders</h3>
+          <button onClick={() => setActiveTab('orders')} className="text-primary font-bold text-sm hover:underline">View All &rarr;</button>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead className="bg-slate-50">
+              <tr>
+                <th className="px-8 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">ID</th>
+                <th className="px-8 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Member</th>
+                <th className="px-8 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Customer</th>
+                <th className="px-8 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {orders.slice(0, 3).map((row) => (
+                <tr key={row.id} className="hover:bg-slate-50/50 transition-colors">
+                  <td className="px-8 py-6 font-mono font-bold text-neutral">{row.id}</td>
+                  <td className="px-8 py-6">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
+                        {row.member[0]}
+                      </div>
+                      <span className="font-bold text-neutral">{row.member}</span>
+                    </div>
+                  </td>
+                  <td className="px-8 py-6 font-medium text-slate-600">{row.customer}</td>
+                  <td className="px-8 py-6">
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
+                      row.status === 'Completed' ? 'bg-green-50 text-green-500' : 
+                      row.status === 'Pending' ? 'bg-amber-50 text-amber-500' : 'bg-red-50 text-red-500'
+                    }`}>
+                      {row.status === 'Completed' ? <CheckCircle2 className="h-3 w-3 mr-1" /> : <Clock className="h-3 w-3 mr-1" />}
+                      {row.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderOrders = () => (
+    <div className="space-y-6">
+      <div className="flex flex-wrap gap-4 justify-between items-center bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+        <div className="relative flex-grow max-w-md">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />
+          <input 
+            type="text" 
+            placeholder="Search by ID or Customer..." 
+            className="w-full pl-12 pr-6 py-3 rounded-2xl bg-slate-50 border-none outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+          />
+        </div>
+        <div className="flex gap-3">
+          <button className="flex items-center space-x-2 px-6 py-3 bg-slate-50 rounded-2xl font-bold text-slate-500 hover:bg-slate-100 transition-all">
+            <Filter className="h-4 w-4" />
+            <span>Filter</span>
+          </button>
+          <button className="px-6 py-3 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
+            Export Data
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
+        <table className="w-full text-left">
+          <thead className="bg-slate-50">
+            <tr>
+              <th className="px-8 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest">Order Info</th>
+              <th className="px-8 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest">Details</th>
+              <th className="px-8 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest">Total</th>
+              <th className="px-8 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest">Status</th>
+              <th className="px-8 py-5 text-xs font-bold text-slate-400 uppercase tracking-widest"></th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {orders.map((order) => (
+              <tr key={order.id} className="hover:bg-slate-50/50 transition-colors group">
+                <td className="px-8 py-6">
+                  <div className="font-mono font-bold text-neutral mb-1">{order.id}</div>
+                  <div className="text-xs text-slate-400 font-bold">{order.time}</div>
+                </td>
+                <td className="px-8 py-6">
+                  <div className="font-bold text-neutral">{order.customer}</div>
+                  <div className="text-sm text-slate-400">For {order.member}</div>
+                </td>
+                <td className="px-8 py-6 font-bold text-neutral">{formatPrice(order.total)}</td>
+                <td className="px-8 py-6">
+                  <span className={`px-4 py-1.5 rounded-full text-xs font-black tracking-widest uppercase ${
+                    order.status === 'Completed' ? 'bg-green-100 text-green-600' : 
+                    order.status === 'Pending' ? 'bg-amber-100 text-amber-600' : 'bg-red-100 text-red-600'
+                  }`}>
+                    {order.status}
+                  </span>
+                </td>
+                <td className="px-8 py-6 text-right">
+                  <button className="p-2 rounded-xl hover:bg-slate-100 text-slate-300 hover:text-neutral transition-all">
+                    <MoreVertical className="h-5 w-5" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  const renderEvents = () => (
+    <div className="space-y-8">
+      <div className="flex justify-between items-center">
+        <h3 className="text-2xl font-bold text-neutral">Active Events</h3>
+        <button className="flex items-center space-x-2 bg-primary text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
+          <Plus className="h-5 w-5" />
+          <span>Add New Event</span>
+        </button>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-8">
+        {mockEvents.map((event) => (
+          <div key={event.id} className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all group">
+            <div className="flex justify-between items-start mb-6">
+              <div className="bg-slate-50 px-5 py-2.5 rounded-2xl text-center">
+                <span className="block text-primary font-black text-xl">{event.date.split(' ')[0]}</span>
+                <span className="block text-slate-400 text-[10px] uppercase font-black">{event.date.split(' ')[1]}</span>
+              </div>
+              <div className="px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-black tracking-widest uppercase">{event.time}</div>
+            </div>
+            <h4 className="text-2xl font-black text-neutral mb-4 group-hover:text-primary transition-colors">{event.title}</h4>
+            <div className="flex items-center text-slate-400 mb-8 font-medium">
+              <MapPin className="h-4 w-4 mr-2" />
+              <span>{event.location}</span>
+            </div>
+            <div className="flex justify-between items-center pt-6 border-t border-slate-50">
+              <span className="text-xl font-black text-neutral">{event.price}</span>
+              <div className="flex gap-2">
+                <button className="px-4 py-2 rounded-xl border border-slate-100 text-sm font-bold text-slate-400 hover:bg-slate-50 transition-all">Edit</button>
+                <button className="px-4 py-2 rounded-xl bg-red-50 text-red-500 text-sm font-bold hover:bg-red-100 transition-all">Delete</button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
@@ -50,14 +233,13 @@ const Dashboard = () => {
             { id: 'overview', name: 'Overview', icon: LayoutDashboard },
             { id: 'orders', name: 'Orders', icon: Ticket },
             { id: 'events', name: 'Events', icon: Calendar },
-            { id: 'members', name: 'Members', icon: Users },
           ].map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-bold transition-all ${
                 activeTab === item.id 
-                  ? 'bg-primary/10 text-primary' 
+                  ? 'bg-primary/10 text-primary shadow-sm' 
                   : 'text-slate-400 hover:text-neutral hover:bg-slate-50'
               }`}
             >
@@ -79,84 +261,45 @@ const Dashboard = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-grow p-8 lg:p-12 overflow-y-auto">
+      <main className="flex-grow p-8 lg:p-12 overflow-y-auto max-h-screen">
         <header className="flex justify-between items-center mb-12">
-          <div>
-            <h2 className="text-3xl font-extrabold text-neutral capitalize">{activeTab} Dashboard</h2>
-            <p className="text-slate-400 font-medium">Welcome back, Admin!</p>
+          <div className="flex items-center space-x-4">
+            <div className="lg:hidden">
+              {/* Mobile menu toggle would go here */}
+              <div className="w-10 h-10 bg-white rounded-xl shadow-sm border border-slate-100 flex items-center justify-center">
+                <Filter className="h-5 w-5 text-slate-400" />
+              </div>
+            </div>
+            <div>
+              <h2 className="text-3xl font-extrabold text-neutral capitalize">{activeTab}</h2>
+              <p className="text-slate-400 font-medium">Manage your Kohi Sekai operations.</p>
+            </div>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center">
-              <Settings className="h-5 w-5 text-slate-400" />
+            <div className="hidden md:flex flex-col items-right text-right mr-2">
+              <span className="text-sm font-bold text-neutral">Administrator</span>
+              <span className="text-[10px] font-bold text-green-500 uppercase tracking-widest">Online</span>
             </div>
-            <div className="w-12 h-12 rounded-2xl bg-primary shadow-lg shadow-primary/20 flex items-center justify-center">
-              <span className="text-white font-bold">A</span>
+            <div className="w-12 h-12 rounded-2xl bg-primary shadow-lg shadow-primary/20 flex items-center justify-center ring-4 ring-white">
+              <span className="text-white font-black">A</span>
             </div>
           </div>
         </header>
 
-        {/* Stats Grid */}
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
-          {stats.map((stat) => (
-            <div key={stat.name} className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-              <div className={`${stat.color} w-12 h-12 rounded-2xl flex items-center justify-center mb-6`}>
-                <stat.icon className="h-6 w-6 text-white" />
-              </div>
-              <h4 className="text-slate-400 font-bold text-sm uppercase tracking-widest mb-1">{stat.name}</h4>
-              <p className="text-3xl font-black text-neutral">{stat.value}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Recent Orders Table */}
-        <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
-          <div className="p-8 border-b border-slate-100 flex justify-between items-center">
-            <h3 className="text-xl font-bold text-neutral">Recent Orders</h3>
-            <button className="text-primary font-bold text-sm hover:underline">View All &rarr;</button>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="bg-slate-50">
-                <tr>
-                  <th className="px-8 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">ID</th>
-                  <th className="px-8 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Member</th>
-                  <th className="px-8 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Customer</th>
-                  <th className="px-8 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Status</th>
-                  <th className="px-8 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Date</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {[
-                  { id: 'KH-8293', member: 'Dea', customer: 'Budi Santoso', status: 'Completed', time: '2 mins ago' },
-                  { id: 'KH-8292', member: 'Vinci', customer: 'Siti Aminah', status: 'Pending', time: '15 mins ago' },
-                  { id: 'KH-8291', member: 'Faatin', customer: 'Andi Wijaya', status: 'Completed', time: '1 hour ago' },
-                ].map((row) => (
-                  <tr key={row.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-8 py-6 font-mono font-bold text-neutral">{row.id}</td>
-                    <td className="px-8 py-6">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
-                          {row.member[0]}
-                        </div>
-                        <span className="font-bold text-neutral">{row.member}</span>
-                      </div>
-                    </td>
-                    <td className="px-8 py-6 font-medium text-slate-600">{row.customer}</td>
-                    <td className="px-8 py-6">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
-                        row.status === 'Completed' ? 'bg-green-50 text-green-500' : 'bg-amber-50 text-amber-500'
-                      }`}>
-                        {row.status === 'Completed' ? <CheckCircle2 className="h-3 w-3 mr-1" /> : <Clock className="h-3 w-3 mr-1" />}
-                        {row.status}
-                      </span>
-                    </td>
-                    <td className="px-8 py-6 text-slate-400 text-sm">{row.time}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        {/* Dynamic Content */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -10 }}
+            transition={{ duration: 0.2 }}
+          >
+            {activeTab === 'overview' && renderOverview()}
+            {activeTab === 'orders' && renderOrders()}
+            {activeTab === 'events' && renderEvents()}
+          </motion.div>
+        </AnimatePresence>
       </main>
     </div>
   );

@@ -7,16 +7,21 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Build artifacts
+dist/
+dist-ssr/
 *.local
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
-.idea
+!.vscode/launch.json
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
@@ -24,7 +29,21 @@ dist-ssr
 *.sln
 *.sw?
 
+# Environment variables
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
 # PHP / Legacy
 legacy_php/
 laravel_backup/
-.env
+
+# Vite / Testing
+/coverage
+/.nyc_output
+
+# Temporary files
+*.tmp
+*.temp

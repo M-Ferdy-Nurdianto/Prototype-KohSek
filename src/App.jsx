@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -6,7 +6,6 @@ import Members from './pages/Members';
 import Cheki from './pages/Cheki';
 import Checkout from './pages/Checkout';
 import Receipt from './pages/Receipt';
-import Login from './pages/admin/Login';
 import Dashboard from './pages/admin/Dashboard';
 
 // Helper component to handle layout logic
@@ -39,7 +38,7 @@ function App() {
           <Route path="/cheki" element={<Cheki />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/receipt" element={<Receipt />} />
-          <Route path="/admin/login" element={<Login />} />
+          <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="/admin/dashboard" element={<Dashboard />} />
         </Routes>
       </LayoutWrapper>

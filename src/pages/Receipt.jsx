@@ -35,12 +35,17 @@ const Receipt = () => {
               <span className="font-mono font-bold text-neutral">{orderData.orderId}</span>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <img src={orderData.memberImage} alt={orderData.member} className="w-16 h-16 rounded-2xl object-cover" />
-              <div>
-                <h4 className="font-bold text-neutral">{orderData.member}</h4>
-                <p className="text-xs text-neutral/50 font-bold uppercase tracking-tighter">{orderData.ticketType} Ticket • {orderData.purchaseType.replace('_', ' ')}</p>
-              </div>
+            <div className="space-y-4">
+              {orderData.cart && orderData.cart.map((item) => (
+                <div key={item.id} className="flex items-center space-x-4 border-b border-neutral/5 pb-4 last:border-0 last:pb-0">
+                  <img src={item.memberImage} alt={item.member} className="w-12 h-12 rounded-xl object-cover" />
+                  <div className="flex-1">
+                    <h4 className="font-bold text-neutral text-sm">{item.member}</h4>
+                    <p className="text-[10px] text-neutral/50 font-bold uppercase tracking-tighter">{item.ticketType} Ticket ({item.quantity}x) • {item.purchaseType.replace('_', ' ')}</p>
+                  </div>
+                  <span className="font-bold text-neutral text-sm">{formatPrice(item.totalPrice)}</span>
+                </div>
+              ))}
             </div>
 
             <div className="space-y-3 pt-4 border-t border-neutral/10">
@@ -54,7 +59,7 @@ const Receipt = () => {
               </div>
               <div className="flex justify-between text-xl pt-4 border-t border-neutral/10">
                 <span className="text-neutral font-black">Total</span>
-                <span className="text-primary font-black">{formatPrice(orderData.price + 2500)}</span>
+                <span className="text-primary font-black">{formatPrice((orderData.cart ? orderData.cart.reduce((sum, item) => sum + item.totalPrice, 0) : 0) + 2500)}</span>
               </div>
             </div>
           </div>

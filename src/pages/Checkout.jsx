@@ -50,19 +50,24 @@ const Checkout = () => {
             <div className="bg-white rounded-4xl p-8 border border-neutral/5 shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
               
-              <div className="flex items-center space-x-6 mb-8 relative z-10">
-                <img src={checkoutData.memberImage} alt={checkoutData.member} className="w-24 h-24 rounded-3xl object-cover shadow-lg" />
-                <div>
-                  <span className="text-xs font-bold text-primary uppercase tracking-widest">{checkoutData.purchaseType.replace('_', ' ')}</span>
-                  <h3 className="text-2xl font-bold text-neutral">{checkoutData.member}</h3>
-                  <p className="text-neutral/50">{checkoutData.ticketType.toUpperCase()} Ticket</p>
-                </div>
+              <div className="space-y-4 mb-8 relative z-10">
+                {checkoutData.cart && checkoutData.cart.map((item) => (
+                  <div key={item.id} className="flex items-center space-x-4 p-4 bg-background rounded-3xl border border-neutral/5">
+                    <img src={item.memberImage} alt={item.member} className="w-16 h-16 rounded-2xl object-cover shadow-sm" />
+                    <div className="flex-1">
+                      <span className="text-[10px] font-bold text-primary uppercase tracking-widest">{item.purchaseType.replace('_', ' ')}</span>
+                      <h4 className="font-bold text-neutral">{item.member}</h4>
+                      <p className="text-xs text-neutral/50 font-bold uppercase">{item.ticketType} Ticket ({item.quantity}x)</p>
+                    </div>
+                    <span className="font-bold text-neutral">{formatPrice(item.totalPrice)}</span>
+                  </div>
+                ))}
               </div>
 
-              <div className="space-y-4 pt-6 border-t border-neutral/5">
+              <div className="space-y-4 pt-6 border-t border-neutral/5 relative z-10">
                 <div className="flex justify-between">
-                  <span className="text-neutral/50 font-medium">Harga Tiket</span>
-                  <span className="text-neutral font-bold">{formatPrice(checkoutData.price)}</span>
+                  <span className="text-neutral/50 font-medium">Subtotal</span>
+                  <span className="text-neutral font-bold">{formatPrice(checkoutData.cart ? checkoutData.cart.reduce((sum, item) => sum + item.totalPrice, 0) : 0)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-neutral/50 font-medium">Biaya Layanan</span>
@@ -70,7 +75,7 @@ const Checkout = () => {
                 </div>
                 <div className="flex justify-between pt-4 border-t border-neutral/5">
                   <span className="text-neutral font-black text-xl">Total Bayar</span>
-                  <span className="text-primary font-black text-2xl">{formatPrice(checkoutData.price + 2500)}</span>
+                  <span className="text-primary font-black text-2xl">{formatPrice((checkoutData.cart ? checkoutData.cart.reduce((sum, item) => sum + item.totalPrice, 0) : 0) + 2500)}</span>
                 </div>
               </div>
             </div>

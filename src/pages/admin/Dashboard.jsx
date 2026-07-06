@@ -38,16 +38,8 @@ const Dashboard = () => {
     vip_ots: 80000
   });
 
-  useEffect(() => {
-    const isAuth = localStorage.getItem('admin_auth');
-    if (!isAuth) {
-      navigate('/admin/login');
-    }
-  }, [navigate]);
-
   const handleLogout = () => {
-    localStorage.removeItem('admin_auth');
-    navigate('/admin/login');
+    navigate('/');
   };
 
   // Mock Data

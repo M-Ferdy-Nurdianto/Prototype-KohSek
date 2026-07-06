@@ -8,24 +8,41 @@ const Cheki = () => {
   const [selectedMember, setSelectedMember] = useState(null);
   const [ticketType, setTicketType] = useState('regular'); // regular or vip
   const [purchaseType, setPurchaseType] = useState('pre_order'); // pre_order or on_the_spot
+  const [quantity, setQuantity] = useState(1);
+  const [cart, setCart] = useState([]);
   const navigate = useNavigate();
 
-  const handleCheckout = () => {
+  const handleAddToCart = () => {
     if (!selectedMember) return;
     
     const ticketInfo = tickets.find(t => t.id === selectedMember.id);
     const price = ticketInfo.pricing[ticketType][purchaseType];
     
+    const newItem = {
+      id: Date.now(),
+      member: selectedMember.name,
+      ticketType,
+      purchaseType,
+      price,
+      quantity,
+      totalPrice: price * quantity,
+      memberImage: selectedMember.image
+    };
+    
+    setCart([...cart, newItem]);
+    setQuantity(1);
+    setSelectedMember(null);
+  };
+
+  const handleCheckout = () => {
+    if (cart.length === 0) return;
+    
     navigate('/checkout', { 
-      state: { 
-        member: selectedMember.name,
-        ticketType,
-        purchaseType,
-        price,
-        memberImage: selectedMember.image
-      } 
+      state: { cart } 
     });
   };
+
+  const cartTotal = cart.reduce((sum, item) => sum + item.totalPrice, 0);
 
   return (
     <div className="pt-32 pb-20 bg-background min-h-screen">
@@ -82,8 +99,8 @@ const Cheki = () => {
                 </h3>
                 <div className="space-y-4">
                   {[
-                    { id: 'regular', name: 'Regular Ticket', desc: '1x Photo + Sign' },
-                    { id: 'vip', name: 'VIP Ticket', desc: '2x Photo + Sign + Digital Copy' }
+                    { id: 'regular', name: 'Regular Cheki', desc: '1x Photo + Sign' },
+                    { id: 'vip', name: 'Wide - VIP Cheki', desc: '1x Wide Photo + Sign + Digital Copy' }
                   ].map((type) => (
                     <button
                       key={type.id}
@@ -107,29 +124,18 @@ const Cheki = () => {
               <div>
                 <h3 className="text-xl font-bold text-neutral mb-8 flex items-center">
                   <span className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm mr-3">3</span>
-                  Waktu Pembelian
+                  Jumlah Tiket
                 </h3>
-                <div className="space-y-4">
-                  {[
-                    { id: 'pre_order', name: 'Pre-Order', desc: 'Lebih hemat & terjamin' },
-                    { id: 'on_the_spot', name: 'On The Spot', desc: 'Beli langsung di lokasi' }
-                  ].map((type) => (
-                    <button
-                      key={type.id}
-                      onClick={() => setPurchaseType(type.id)}
-                      className={`w-full p-6 rounded-3xl border-2 text-left transition-all ${
-                        purchaseType === type.id ? 'border-primary bg-primary/5' : 'border-neutral/10 hover:border-primary/50'
-                      }`}
-                    >
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <span className="block font-bold text-neutral">{type.name}</span>
-                          <span className="text-sm text-neutral/50">{type.desc}</span>
-                        </div>
-                        {purchaseType === type.id && <Check className="text-primary" />}
-                      </div>
-                    </button>
-                  ))}
+                <div className="flex items-center space-x-6">
+                  <button 
+                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                    className="w-12 h-12 rounded-full border-2 border-neutral/10 flex items-center justify-center hover:border-primary hover:text-primary transition-colors font-bold text-xl"
+                  >-</button>
+                  <span className="text-2xl font-bold text-neutral w-8 text-center">{quantity}</span>
+                  <button 
+                    onClick={() => setQuantity(q => q + 1)}
+                    className="w-12 h-12 rounded-full border-2 border-neutral/10 flex items-center justify-center hover:border-primary hover:text-primary transition-colors font-bold text-xl"
+                  >+</button>
                 </div>
               </div>
             </div>
@@ -138,50 +144,58 @@ const Cheki = () => {
           {/* Sidebar Summary */}
           <div className="lg:col-span-1">
             <div className="sticky top-32 glass p-8 rounded-4xl border border-white/20 shadow-2xl">
-              <h3 className="text-2xl font-bold text-neutral mb-8">Summary</h3>
+              <h3 className="text-2xl font-bold text-neutral mb-6">Keranjang</h3>
               
-              <div className="space-y-6 mb-8">
-                <div className="flex justify-between items-center pb-4 border-b border-neutral/5">
-                  <span className="text-neutral/50">Member</span>
-                  <span className="font-bold text-neutral">{selectedMember?.name || '-'}</span>
-                </div>
-                <div className="flex justify-between items-center pb-4 border-b border-neutral/5">
-                  <span className="text-neutral/50">Tipe Tiket</span>
-                  <span className="font-bold text-neutral uppercase">{ticketType}</span>
-                </div>
-                <div className="flex justify-between items-center pb-4 border-b border-neutral/5">
-                  <span className="text-neutral/50">Kategori</span>
-                  <span className="font-bold text-neutral uppercase">{purchaseType.replace('_', ' ')}</span>
-                </div>
-                <div className="flex justify-between items-center pt-4">
-                  <span className="text-neutral font-bold">Total</span>
-                  <span className="text-3xl font-black text-primary">
-                    {selectedMember 
-                      ? formatPrice(tickets.find(t => t.id === selectedMember.id).pricing[ticketType][purchaseType])
-                      : 'Rp 0'
-                    }
-                  </span>
-                </div>
+              <div className="space-y-4 mb-6 max-h-[300px] overflow-y-auto pr-2">
+                {cart.length === 0 ? (
+                  <p className="text-center text-sm text-neutral/40 py-4">Keranjang masih kosong</p>
+                ) : (
+                  cart.map((item) => (
+                    <div key={item.id} className="flex items-center space-x-3 p-3 bg-white/50 rounded-2xl border border-neutral/10">
+                      <img src={item.memberImage} alt={item.member} className="w-12 h-12 rounded-xl object-cover" />
+                      <div className="flex-1">
+                        <p className="font-bold text-neutral text-sm leading-tight">{item.member}</p>
+                        <p className="text-[10px] text-neutral/50 font-bold uppercase tracking-widest">{item.ticketType} ({item.quantity}x)</p>
+                      </div>
+                      <p className="font-bold text-primary text-sm">{formatPrice(item.totalPrice)}</p>
+                    </div>
+                  ))
+                )}
               </div>
 
-              <button
-                disabled={!selectedMember}
-                onClick={handleCheckout}
-                className={`w-full py-5 rounded-full font-bold text-lg flex items-center justify-center transition-all ${
-                  selectedMember 
-                    ? 'bg-primary text-white shadow-xl shadow-primary/30 hover:scale-105 active:scale-95' 
-                    : 'bg-neutral/10 text-neutral/30 cursor-not-allowed'
-                }`}
-              >
-                <Ticket className="mr-2 h-5 w-5" />
-                Checkout Sekarang
-              </button>
-              
-              {!selectedMember && (
-                <p className="text-center text-xs text-neutral/40 mt-4 animate-pulse">
-                  * Silakan pilih member terlebih dahulu
-                </p>
-              )}
+              <div className="flex justify-between items-center pt-4 border-t border-neutral/10 mb-6">
+                <span className="text-neutral font-bold">Total</span>
+                <span className="text-3xl font-black text-primary">
+                  {formatPrice(cartTotal)}
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                <button
+                  disabled={!selectedMember}
+                  onClick={handleAddToCart}
+                  className={`w-full py-4 rounded-full font-bold flex items-center justify-center transition-all ${
+                    selectedMember 
+                      ? 'bg-neutral/10 text-neutral hover:bg-neutral/20 active:scale-95' 
+                      : 'bg-neutral/5 text-neutral/30 cursor-not-allowed'
+                  }`}
+                >
+                  Tambah ke Keranjang
+                </button>
+
+                <button
+                  disabled={cart.length === 0}
+                  onClick={handleCheckout}
+                  className={`w-full py-4 rounded-full font-bold flex items-center justify-center transition-all ${
+                    cart.length > 0 
+                      ? 'bg-primary text-white shadow-xl shadow-primary/30 hover:scale-105 active:scale-95' 
+                      : 'bg-neutral/10 text-neutral/30 cursor-not-allowed'
+                  }`}
+                >
+                  <Ticket className="mr-2 h-5 w-5" />
+                  Checkout Sekarang
+                </button>
+              </div>
             </div>
           </div>
         </div>
